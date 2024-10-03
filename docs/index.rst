@@ -1,15 +1,20 @@
-FuseMap
+AutoSort
 =====================================
 
 
-Spatial integration and mapping with universal gene, cell, and tissue embeddings.
+Multimodal deep learning for real-time stable decoding of month-long neural activities from the same cells
 -----------------------------------------------------------------------------------
-FuseMap is a deep-learning framework for spatial transcriptomics 
-that (1) bridges single-cell or single-spot gene expression within spatial contexts 
-and (2) consolidates various gene panels across technologies, organs, and species.
+.. image:: _static/figure1.png
+    :width: 100%
+    :align: center
+    
+    
+AutoSort is designed to tackle two significant challenges in long-term stable recording. 
+- First, it efficiently aligns neurons over the course of long-term recordings to ensure consistent tracking of the same neurons each day. 
+- Second, it accurately sorts spikes while maintaining the precision throughout the recordings, ensuring that the performance achieved at the first of the recordings is sustained throughout the later days.
 
 
-.. image:: _static/framework.png
+.. image:: _static/figure2.png
     :width: 100%
     :align: center
 
@@ -31,19 +36,17 @@ Contents
 Quick start
 ------------------------------------------
 
-Spatial integration
+Spike sorting
 ^^^^^^^^^^^^^^^^^^^^^
-:mod:`fusemap.spatial_integrate` provides tools to integrate spatial transcriptomics data.
-Input data can be from any spatial transcriptomics technology, such as Visium, Slide-seq, or MERFISH.
-Output data can be used for downstream analysis, such as clustering, cell type identification, or spatial gene expression analysis.
+:mod:`autosort.run` provides tools to efficiently sort spikes from long-term recordings.
 
 
-Spatial mapping
+Online decoding
 ^^^^^^^^^^^^^^^^^^^
-:mod:`fusemap.spatial_map` provides tools to map spatial transcriptomics data to a universal gene, cell, and tissue embedding space.
+:mod:`autosort.decoding` provides tools to decode neural activities from the same cells across days.
 
 
 Step-by-step guide 
 ^^^^^^^^^^^^^^^^^^^
-Check out our detailed `tutorials <tutorials.html>`_ on how to use FuseMap for spatial integration and mapping.
+Check out our detailed `tutorials <tutorials.html>`_ on how to use AutoSort with provided real electrophysiology datasets.
 

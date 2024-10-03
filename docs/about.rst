@@ -21,6 +21,6 @@ How to Cite
 
 To cite AutoSort in publications please use:
 
-**Towards a universal spatial molecular atlas of the mouse brain.**
-Yichun He, Hao Sheng, Hailing Shi, Wendy Xueyi Wang, Zefang Tang, Jia Liu, Xiao Wang
-*bioRxiv.* `https://doi.org/10.1101/2024.05.27.594872 <https://doi.org/10.1101/2024.05.27.594872>`__
+**Multimodal deep learning for real-time stable tracking of month-long neural activities from the same cells.**
+Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. 
+*bioRxiv.* `? <?>`__
