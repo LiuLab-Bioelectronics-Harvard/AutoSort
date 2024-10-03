@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../..'))
-sys.path.insert(0, os.path.abspath('../../fusemap'))
+sys.path.insert(0, os.path.abspath('../../autosort_neuron'))
 
 project = 'AutoSort'
 copyright = '2024, Yichun He'
@@ -99,4 +99,4 @@ html_css_files = ['custom.css']
 
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "fusemap-doc"
+htmlhelp_basename = "autosort-doc"
