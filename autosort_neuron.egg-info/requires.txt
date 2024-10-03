@@ -1,0 +1,7 @@
+spikeinterface[full,widgets]
+torch
+pandas
+scikit-learn
+matplotlib
+scipy
+networkx
