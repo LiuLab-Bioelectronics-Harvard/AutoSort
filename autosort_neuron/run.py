@@ -77,7 +77,7 @@ def run(args):
                         'validation_acc_noise':[],
                         'validation_acc_label':[]}
 
-        for epoch in range(epochs):
+        for epoch in tqdm(range(epochs)):
             training_log['epoch'].append(epoch + 1)
             print("epoch : {}/{}".format(epoch + 1, epochs))
 
@@ -87,7 +87,7 @@ def run(args):
             autosort_model.train()
             autosort_model.bceloss.pos_weight = autosort_model.bceloss.pos_weight.to(device)
             autosort_model.bceloss_label.pos_weight = autosort_model.bceloss_label.pos_weight.to(device)
-            for batch_features, classify_labels, labels, single_waveform,pred_loc in tqdm(train_loader):
+            for batch_features, classify_labels, labels, single_waveform,pred_loc in train_loader:
                 classify_labels = classify_labels.to(device)
                 batch_features = batch_features.view(-1, args.samplepoints*args.ch_num).to(device)
                 labels = labels.to(device)
@@ -104,7 +104,7 @@ def run(args):
             loss1 = loss1 / len(train_loader)
             loss2 = loss2 / len(train_loader)
             loss3 = loss3 / len(train_loader)
-            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, loss1,loss2,loss3))
+            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, loss2,loss3))
 
 
             valid_loss1 = 0.0
@@ -116,7 +116,7 @@ def run(args):
             gt_class_all = []
             pred_class_all = []
             autosort_model.eval()
-            for data, classify_labels, labels, single_waveform,pred_loc in tqdm(val_loader):
+            for data, classify_labels, labels, single_waveform,pred_loc in val_loader:
                 classify_labels = classify_labels.to(device)
                 data = data.view(-1, args.samplepoints * args.ch_num).to(device)
                 labels = labels.to(device)
@@ -139,7 +139,7 @@ def run(args):
             valid_loss2 = valid_loss2 / len(val_loader)
             valid_loss3 = valid_loss3 / len(val_loader)
             valid_loss = valid_loss1 +valid_loss2 + valid_loss3
-            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, valid_loss1, valid_loss2, valid_loss3))
+            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, valid_loss2, valid_loss3))
 
 
             training_log['validation_acc_noise'].append(accuracy_score(gt_all, pred_all))
@@ -175,7 +175,7 @@ def run(args):
             gt_class_all = []
             pred_class_all = []
             autosort_model.eval()
-            for data, classify_labels, labels, single_waveform,pred_loc in tqdm(test_notpure_loader):
+            for data, classify_labels, labels, single_waveform,pred_loc in test_notpure_loader:
                 classify_labels = classify_labels.to(device)
                 data = data.view(-1, args.samplepoints * args.ch_num).to(device)
                 labels = labels.to(device)
@@ -224,7 +224,7 @@ def run(args):
             code_all_label = []
             pred_prob_all=[]
             autosort_model.eval()
-            for data, classify_labels, labels, single_waveform, pred_loc in tqdm(test_notpure_loader):
+            for data, classify_labels, labels, single_waveform, pred_loc in test_notpure_loader:
                 classify_labels = classify_labels.to(device)
                 data = data.view(-1, args.samplepoints * args.ch_num).to(device)
                 labels = labels.to(device)

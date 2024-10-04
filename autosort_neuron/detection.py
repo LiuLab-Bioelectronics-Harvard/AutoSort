@@ -132,7 +132,7 @@ def generate_autosort_input(
     ### examine if the data is already loaded
     for date_id_all_i in date_id_all:
         save_folder_name = date_id_all_i
-        data_folder_all = f"./processed_data/Ephys_concat_{save_folder_name}/"
+        data_folder_all = f"./processed_data/Ephys_{save_folder_name}/"
         if os.path.exists(data_folder_all) == False:
             _, _ = read_data_folder(
                 data_folder_all,
@@ -150,7 +150,7 @@ def generate_autosort_input(
 
         print("### 1. load raw data")
         recording_concat = spikeinterface.core.base.BaseExtractor.load_from_folder(
-            day_pth + "Ephys_concat_" + date_id_all_i + "/"
+            day_pth + "Ephys_" + date_id_all_i + "/"
         )
         recording_f = spikeinterface.preprocessing.bandpass_filter(
             recording_concat, freq_min=freq_min, freq_max=freq_max

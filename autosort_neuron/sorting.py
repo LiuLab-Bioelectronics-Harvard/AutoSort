@@ -873,6 +873,7 @@ def read_data_folder(
     day_length = []
     cont_trigger_all_all = []
     if os.path.exists(data_folder_all):
+        print('loading from existing folder:', data_folder_all)
         recording_concat = spikeinterface.core.base.BaseExtractor.load_from_folder(
             data_folder_all
         )
@@ -882,9 +883,11 @@ def read_data_folder(
             cont_trigger_all_all = np.load(data_folder_all + "cont_trigger_all_all.npy")
     else:
         for date_id in date_id_all:
+            print('processing:', date_id)
             pack_folder_pre = raw_data_path + date_id
-            data_folder_pre = f"../processed_data/Ephys_{date_id}/"
+            data_folder_pre = f"./processed_data/Ephys_{date_id}/"
             if os.path.exists(data_folder_pre):
+                print('-- loading from existing folder:', data_folder_pre)
                 recording = spikeinterface.core.base.BaseExtractor.load_from_folder(
                     data_folder_pre
                 )
@@ -902,7 +905,7 @@ def read_data_folder(
                     )
 
                 recording.set_probe(mesh_probe, in_place=True)
-
+                print('--saving to:', data_folder_pre)
                 recording = recording.save(folder=data_folder_pre)
                 np.save(data_folder_pre + "session_length.npy", session_length)
                 if trigger:
@@ -921,6 +924,7 @@ def read_data_folder(
             traces_list=recording_traces, sampling_frequency=sampling_freq
         )
         recording_concat.set_probe(mesh_probe, in_place=True)
+        print('saving to:', data_folder_all)
         recording_concat = recording_concat.save(folder=data_folder_all)
         np.save(data_folder_all + "session_length.npy", session_length_concat)
         np.save(data_folder_all + "day_length.npy", day_length)
