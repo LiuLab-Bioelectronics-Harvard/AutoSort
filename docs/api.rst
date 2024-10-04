@@ -10,63 +10,93 @@ API Reference
 
     API Reference <self>
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Core Functionality
-    :hidden:
-
-    modules/spatial_integrate
-    modules/spatial_map
-
-    
-    
-.. toctree::
-    :maxdepth: 2
-    :caption: Model Training
-    :hidden:
-
-    modules/loss
-    modules/model
-    modules/train
-    modules/train_model
-    modules/dataset
-
+Subpackages
+-----------
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Utilities
-    :hidden:
+   :maxdepth: 4
 
-    modules/config
-    modules/logger
-    modules/preprocess
-    modules/utils
+   autosort_neuron.intanutil
 
-Core Functionality
---------------------------------------------------------------------------------
+Submodules
+----------
 
-These modules provide functionality for FuseMap for spatial integration and mapping.
+autosort\_neuron.auto\_sorting module
+-------------------------------------
 
-* :mod:`fusemap.spatial_integrate`
-* :mod:`fusemap.spatial_map`
+.. automodule:: autosort_neuron.auto_sorting
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-Model Training
---------------------------------------------------------------------------------
+autosort\_neuron.config module
+------------------------------
 
-These modules provide functionality for training FuseMap models.
+.. automodule:: autosort_neuron.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-* :mod:`fusemap.loss`
-* :mod:`fusemap.model`
-* :mod:`fusemap.train`
-* :mod:`fusemap.train_model`
-* :mod:`fusemap.dataset`
+autosort\_neuron.detection module
+---------------------------------
 
-Utilities
---------------------------------------------------------------------------------
+.. automodule:: autosort_neuron.detection
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-These modules provide utility functions for FuseMap.
+autosort\_neuron.model module
+-----------------------------
 
-* :mod:`fusemap.config`
-* :mod:`fusemap.logger`
-* :mod:`fusemap.preprocess`
-* :mod:`fusemap.utils`
+.. automodule:: autosort_neuron.model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autosort\_neuron.run module
+---------------------------
+
+.. automodule:: autosort_neuron.run
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autosort\_neuron.sma module
+---------------------------
+
+.. automodule:: autosort_neuron.sma
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autosort\_neuron.sorting module
+-------------------------------
+
+.. automodule:: autosort_neuron.sorting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autosort\_neuron.utils module
+-----------------------------
+
+.. automodule:: autosort_neuron.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autosort\_neuron.waveform\_loader module
+----------------------------------------
+
+.. automodule:: autosort_neuron.waveform_loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: autosort_neuron
+   :members:
+   :undoc-members:
+   :show-inheritance:

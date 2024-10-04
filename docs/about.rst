@@ -15,7 +15,7 @@ How to Cite
 
 To cite AutoSort in publications please use:
 
-**Multimodal deep learning for real-time stable tracking of month-long neural activities from the same cells.**
+**End-to-end multimodal deep learning for real-time decoding of months-long neural activity from the same cells **
 Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. 
 *bioRxiv.* `? <?>`__
 
