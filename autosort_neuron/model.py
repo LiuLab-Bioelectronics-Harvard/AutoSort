@@ -216,6 +216,6 @@ class AutoSort:
         pred_class = torch.argmax(cls_label_output,axis=1)
         gt_label_class = torch.argmax(classify_labels[:, :len(self.set_shank_id)], axis=1)
 
-        prob = nnf.softmax(cls_label_output, dim=1)
+        # prob = nnf.softmax(cls_label_output, dim=1)
 
-        return gt, pred, gt_label_class, pred_class, codestest, codestest_label, prob
+        return gt, pred, gt_label_class, pred_class, codestest, codestest_label

@@ -104,7 +104,7 @@ def run(args):
             loss1 = loss1 / len(train_loader)
             loss2 = loss2 / len(train_loader)
             loss3 = loss3 / len(train_loader)
-            print("epoch : {}/{}, loss 1 = {:.6f}, loss 2 = {:.6f},, loss 3 = {:.6f}".format(epoch + 1, epochs, loss1,loss2,loss3))
+            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, loss1,loss2,loss3))
 
 
             valid_loss1 = 0.0
@@ -139,7 +139,7 @@ def run(args):
             valid_loss2 = valid_loss2 / len(val_loader)
             valid_loss3 = valid_loss3 / len(val_loader)
             valid_loss = valid_loss1 +valid_loss2 + valid_loss3
-            print("epoch : {}/{}, val loss 1 = {:.6f}, loss 2 = {:.6f},loss 3 = {:.6f}".format(epoch + 1, epochs, valid_loss1, valid_loss2, valid_loss3))
+            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, valid_loss1, valid_loss2, valid_loss3))
 
 
             training_log['validation_acc_noise'].append(accuracy_score(gt_all, pred_all))

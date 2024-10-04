@@ -7,12 +7,6 @@ Support
 You can report issues with AutoSort using our GitHub
 `issue tracker <https://github.com/LiuLab-Bioelectronics-Harvard/AutoSort/issues>`__.
 
-.. _Authors:
-
-Authors
---------------------------------------------------------------------------------
-
-`Yichun He <https://yichunher.github.io/>`__
 
 .. _Cite:
 
@@ -24,3 +18,11 @@ To cite AutoSort in publications please use:
 **Multimodal deep learning for real-time stable tracking of month-long neural activities from the same cells.**
 Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. 
 *bioRxiv.* `? <?>`__
+
+
+.. _Authors:
+
+Authors
+--------------------------------------------------------------------------------
+
+`Yichun He <https://yichunher.github.io/>`__

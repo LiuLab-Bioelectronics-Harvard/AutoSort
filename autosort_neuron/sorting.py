@@ -16,7 +16,7 @@ spikeinterface.__version__
 import spikeinterface
 import spikeinterface.extractors as se
 import spikeinterface.sorters as ss
-# import spikeinterface.toolkit as st
+import spikeinterface.toolkit as st
 import spikeinterface.widgets as sw
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,15 +36,16 @@ warnings.filterwarnings("ignore")
 def sorting_unit_show(we, recording_cmr, sorting, pack_folder, waveform_folder):
     # plot_probe(mesh_probe,with_channel_index=True)
 
-    fig, axs = plt.subplots(
-        int(np.ceil(len(sorting.unit_ids) / 4)),
-        4,
-        figsize=(20, 5 * np.ceil(len(sorting.unit_ids) / 4)),
-    )
-    sw.plot_unit_templates(we, unit_ids=sorting.unit_ids, axes=axs)
+    # fig, axs = plt.subplots(
+    #     int(np.ceil(len(sorting.unit_ids) / 4)),
+    #     4,
+    #     figsize=(20, 5 * np.ceil(len(sorting.unit_ids) / 4)),
+    # )
+    sw.plot_unit_templates(we, unit_ids=sorting.unit_ids, 
+                           figsize=(20, 5 * np.ceil(len(sorting.unit_ids) / 4)))
     plt.savefig(waveform_folder + "/templates_map.png", dpi=300)
 
-    extremum_channels_ids = spikeinterface.core.get_template_extremum_channel(we, peak_sign="neg")
+    extremum_channels_ids = st.get_template_extremum_channel(we, peak_sign="neg")
 
     colors = []
     cm = get_cmap("rainbow")
@@ -457,7 +458,7 @@ def recording_shank_split(
     probe_groups=None,
 ):
 
-    extremum_channels_ids = spikeinterface.core.get_template_extremum_channel(we, peak_sign="neg")
+    extremum_channels_ids = st.get_template_extremum_channel(we, peak_sign="neg")
 
     if probe_groups is None:
         probe_groups = np.arange(0, 30)
@@ -744,7 +745,7 @@ def sorting_shank_split(
 
     # Plot extremum waveforms
     if waveform_show == True:
-        extremum_channels_ids = spikeinterface.core.get_template_extremum_channel(we, peak_sign="neg")
+        extremum_channels_ids = st.get_template_extremum_channel(we, peak_sign="neg")
         fig, axs = plt.subplots(
             int(np.ceil(len(sorting.unit_ids) / 5)),
             5,
