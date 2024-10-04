@@ -22,9 +22,7 @@ import spikeinterface.widgets as sw
 import matplotlib.pyplot as plt
 import numpy as np
 import shutil
-import seaborn as sns
 import pandas as pd
-import seaborn as sns
 from scipy.io import loadmat
 from spikeinterface.core.npzsortingextractor import NpzSortingExtractor
 import warnings
@@ -51,12 +49,22 @@ def read_AutoSort_data(date_id_all,
                        results_data_path,
                        file_name = 'AutoSort_sorting.npz',
                        save_pth=None,
-                       Keep_id=None, 
-                       unit_list_all=None,
+                       extremum_channels_ids_pth=None,
+                    #    Keep_id=None, 
+                    #    unit_list_all=None,
                        trigger = True,
                         freq_max=3000,
-                        freq_min=300):
+                        freq_min=300,
+                        sampling_frequency=10000):
     
+    extremum_channels_ids = pd.read_csv(extremum_channels_ids_pth, index_col=0)
+    unit_list_all = {}
+    for i, j in zip(
+        extremum_channels_ids.index, extremum_channels_ids.values.flatten()
+    ):
+        unit_list_all[i] = j
+    Keep_id = list(unit_list_all.keys())
+
     data_folder_all = day_pth+ f'/Ephys_concat_{date_id_all}/'
 
     if trigger:
@@ -65,7 +73,8 @@ def read_AutoSort_data(date_id_all,
         cont_trigger_all_all = cont_trigger_all_all[0,:]
 
     trial_start, trial_end = find_trials(cont_trigger_all_all)
-    print(f'{date_id_all} interval:',trial_end[10]-trial_start[10])
+    num_trial = len(trial_start)
+    print(f'{date_id_all} there are {num_trial} trials at an interval of:',trial_end[-1]-trial_start[-1])
     
     
     recording_concat = spikeinterface.core.base.BaseExtractor.load_from_folder(data_folder_all)
@@ -91,9 +100,9 @@ def read_AutoSort_data(date_id_all,
         pred_class_all = np.array(pred_class_all['0'])
 
         # read gt spike time
-        with (open(save_pth+'/generate_input_cmr/'+date_id_all+'/test_data/X_spiketrain_time.pkl', "rb")) as openfile:
+        with (open(save_pth+'/input/'+date_id_all+'/test_data/X_spiketrain_time.pkl', "rb")) as openfile:
             X_spiketrain_time_test = pickle.load(openfile)
-        with (open(save_pth+'/generate_input_cmr/'+date_id_all+'/test_data/Y_spike_id_noise.pkl', "rb")) as openfile:
+        with (open(save_pth+'/input/'+date_id_all+'/test_data/Y_spike_id_noise.pkl', "rb")) as openfile:
             Y_spiketrain_id_final_test = pickle.load(openfile)
 
         print(f'origin spike num:{pred_all.shape[0]}')
@@ -127,7 +136,7 @@ def read_AutoSort_data(date_id_all,
         print(f'label prob spike num:{spike_time.shape[0]}')
 
         # create sorting object
-        sorting = se.NumpySorting.from_times_labels([spike_time], [neuron_unitid], 10000)
+        sorting = se.NumpySorting.from_times_labels([spike_time], [neuron_unitid], sampling_frequency)
         se.NpzSortingExtractor.write_sorting(sorting, file_path+file_name)
     return sorting,  trial_start, trial_end,  cont_trigger_all_all,recording_cmr
 

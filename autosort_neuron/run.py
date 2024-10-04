@@ -205,8 +205,9 @@ def run(args):
         Path(save_dir_offline).mkdir(parents=True, exist_ok=True)
         for test_time in args.test_time:
             set_day_id_str = args.day_id_str[test_time]
+            test_data_path = args.cluster_path+"input/"+set_day_id_str
 
-            test_notpure_dataset = waveformLoader(data_path+'/test_data/',
+            test_notpure_dataset = waveformLoader(test_data_path+'/test_data/',
                                             shank_channel = set_channel_id,
                                             sensor_positions=sensor_positions,
                                             Keep_id = train_notpure_dataset.keep_id,
@@ -221,6 +222,7 @@ def run(args):
             pred_class_all = []
             code_all_latent = []
             code_all_label = []
+            pred_prob_all=[]
             autosort_model.eval()
             for data, classify_labels, labels, single_waveform, pred_loc in tqdm(test_notpure_loader):
                 classify_labels = classify_labels.to(device)
@@ -229,22 +231,25 @@ def run(args):
                 single_waveform = single_waveform.to(device)
                 pred_loc = torch.tensor(pred_loc).to(device)
 
-                gt, pred, gt_label_class, pred_class, codetest, codetest_label = autosort_model.iter_model_eval_umap(
+                _, pred, _, pred_class, codetest, codetest_label, pred_prob = autosort_model.iter_model_eval_umap(
                     data, classify_labels, labels, single_waveform, pred_loc)
 
                 code_all_latent.append(codetest.detach().cpu().numpy())
                 code_all_label.append(codetest_label.detach().cpu().numpy())
 
-                gt_all.append(gt.detach().cpu().numpy())
+                # gt_all.append(gt.detach().cpu().numpy())
                 pred_all.append(pred.detach().cpu().numpy())
                 pred_class_all.append(pred_class.detach().cpu().numpy())
-                gt_class_all.append(gt_label_class.detach().cpu().numpy())
+                # gt_class_all.append(gt_label_class.detach().cpu().numpy())
+                pred_prob_all.append(pred_prob.detach().cpu().numpy())
 
-            gt_all = np.concatenate(gt_all, axis=0)
+            # gt_all = np.concatenate(gt_all, axis=0)
             pred_all = np.concatenate(pred_all, axis=0)
-            gt_class_all = np.concatenate(gt_class_all, axis=0)
+            # gt_class_all = np.concatenate(gt_class_all, axis=0)
             pred_class_all = np.concatenate(pred_class_all, axis=0)
             code_all_latent = np.vstack(code_all_latent)
+            pred_prob_all = np.vstack(pred_prob_all)
+
             code_all_label_final = []
             for i in code_all_label:
                 if i.shape[0] > 0:
@@ -252,9 +257,10 @@ def run(args):
             code_all_label_final = np.vstack(code_all_label_final)
 
             Path(save_dir_offline + set_day_id_str + '/').mkdir(parents=True, exist_ok=True)
-            pd.DataFrame(gt_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'gt_all.csv')
+            # pd.DataFrame(gt_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'gt_all.csv')
             pd.DataFrame(pred_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'pred_all.csv')
-            pd.DataFrame(gt_class_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'gt_class_all.csv')
+            # pd.DataFrame(gt_class_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'gt_class_all.csv')
             pd.DataFrame(pred_class_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'pred_class_all.csv')
             pd.DataFrame(code_all_latent).to_csv(save_dir_offline + set_day_id_str + '/' + 'code_all_latent.csv')
             pd.DataFrame(code_all_label_final).to_csv(save_dir_offline + set_day_id_str + '/' + 'code_all_label.csv')
+            pd.DataFrame(pred_prob_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'pred_prob_all.csv')

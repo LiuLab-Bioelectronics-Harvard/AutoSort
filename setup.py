@@ -31,11 +31,6 @@ setup(
     install_requires=[
         'spikeinterface[full,widgets]==0.95.1',
         'torch',
-        'pandas',
-        'scikit-learn',
-        'matplotlib',
-        'scipy',
-        'networkx',
         'mountainsort4',
     ],
     

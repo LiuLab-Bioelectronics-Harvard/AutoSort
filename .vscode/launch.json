@@ -12,7 +12,7 @@
             "request": "launch",
             "program": "main.py",
             "console": "integratedTerminal",
-            "python": "/n/home07/yichunhe/.conda/envs/autosort/bin/python", 
+            "python": "/n/home07/yichunhe/.conda/envs/autosort_new/bin/python", 
             "args": [
                 // "--model_num", "AutoSort1"
                 // "--input_data_folder_path", "/home/jialiulab/disk1/yichun/FuseMap/input_data/mouse_human_brain_integrate/",

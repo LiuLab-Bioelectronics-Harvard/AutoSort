@@ -6,3 +6,4 @@ from autosort_neuron.sorting import *
 from autosort_neuron.detection import *
 from autosort_neuron.config import *
 from autosort_neuron.run import *
+from autosort_neuron.auto_sorting import *
