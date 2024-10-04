@@ -26,12 +26,13 @@ with open('README.md','r') as f:
 
 setup(
     name='autosort_neuron',
-    version='0.0.1.4',
+    version='0.0.1.5',
     packages=find_packages(),
     install_requires=[
         'spikeinterface[full,widgets]==0.95.1',
         'torch',
         'mountainsort4',
+        'scikit-image'
     ],
     
     long_description=description,

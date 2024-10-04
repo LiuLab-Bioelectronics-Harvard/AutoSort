@@ -114,20 +114,11 @@ def generate_autosort_input(
     freq_min,
     freq_max,
     mesh_probe,
+    mode='train'
 ):
-    all_save_folder_name = "_".join(date_id_all)
-
-    for i in date_id_all:
-        save_folder_name = i
-        data_folder_all = f"./processed_data/Ephys_concat_{save_folder_name}/"
-        if os.path.exists(data_folder_all) == False:
-            _, _ = read_data_folder(
-                data_folder_all,
-                [i],
-                raw_data_path,
-                mesh_probe,
-            )
-
+    
+    if mode=='train':
+        all_save_folder_name = "_".join(date_id_all)
         pth = f"./processed_data/Ephys_concat_{all_save_folder_name}/"
         extremum_channels_ids = pd.read_csv(
             pth + "mountainsort/extremum_channels_ids.csv", index_col=0
@@ -138,47 +129,60 @@ def generate_autosort_input(
         ):
             unit_list_all[i] = j
 
-        for set_time in np.arange(0, len(date_id_all)):
-
-            date_id_all_i = date_id_all[set_time]
-            if os.path.exists(save_pth + "/input/" + date_id_all_i + "/"):
-                continue
-            print("###", date_id_all_i)
-
-            print("### 1. load raw data")
-            recording_concat = spikeinterface.core.base.BaseExtractor.load_from_folder(
-                day_pth + "Ephys_concat_" + date_id_all_i + "/"
+    ### examine if the data is already loaded
+    for date_id_all_i in date_id_all:
+        save_folder_name = date_id_all_i
+        data_folder_all = f"./processed_data/Ephys_concat_{save_folder_name}/"
+        if os.path.exists(data_folder_all) == False:
+            _, _ = read_data_folder(
+                data_folder_all,
+                [date_id_all_i],
+                raw_data_path,
+                mesh_probe,
             )
-            recording_f = spikeinterface.preprocessing.bandpass_filter(
-                recording_concat, freq_min=freq_min, freq_max=freq_max
-            )
-            recording_cmr = spikeinterface.preprocessing.common_reference(
-                recording_f, reference="global", operator="average"
-            )
-            trace0_car = recording_cmr.get_traces(segment_index=0)
 
-            print("### 2. detect spikes")
-            spiketrain = {}
-            all_spike_train = []
-            spike_loc = []
-            spikes = detect_spike(
-                trace0_car,
-                thr_min=3,
-                thr_max=30,
-                distance=3,
-                ch_max_simul_firing=5,
-                wlen=5,
-                prominence=10,
-            )
-            for channel_num in range(trace0_car.shape[1]):
-                spiketrain_loc = np.where(spikes[:, channel_num])[0]
-                spiketrain[channel_num] = spiketrain_loc
-                all_spike_train += list(spiketrain_loc)
-                spike_loc += [channel_num] * len(spiketrain_loc)
-            X_spiketrain_time = all_spike_train
-            Y_spiketrain_id_final = spike_loc
-            detect_array = np.array([X_spiketrain_time, Y_spiketrain_id_final]).T
+    for set_time in np.arange(0, len(date_id_all)):
 
+        date_id_all_i = date_id_all[set_time]
+        if os.path.exists(save_pth + "/input/" + date_id_all_i + "/"):
+            continue
+        print("###", date_id_all_i)
+
+        print("### 1. load raw data")
+        recording_concat = spikeinterface.core.base.BaseExtractor.load_from_folder(
+            day_pth + "Ephys_concat_" + date_id_all_i + "/"
+        )
+        recording_f = spikeinterface.preprocessing.bandpass_filter(
+            recording_concat, freq_min=freq_min, freq_max=freq_max
+        )
+        recording_cmr = spikeinterface.preprocessing.common_reference(
+            recording_f, reference="global", operator="average"
+        )
+        trace0_car = recording_cmr.get_traces(segment_index=0)
+
+        print("### 2. detect spikes")
+        spiketrain = {}
+        all_spike_train = []
+        spike_loc = []
+        spikes = detect_spike(
+            trace0_car,
+            thr_min=3,
+            thr_max=30,
+            distance=3,
+            ch_max_simul_firing=5,
+            wlen=5,
+            prominence=10,
+        )
+        for channel_num in range(trace0_car.shape[1]):
+            spiketrain_loc = np.where(spikes[:, channel_num])[0]
+            spiketrain[channel_num] = spiketrain_loc
+            all_spike_train += list(spiketrain_loc)
+            spike_loc += [channel_num] * len(spiketrain_loc)
+        X_spiketrain_time = all_spike_train
+        Y_spiketrain_id_final = spike_loc
+        detect_array = np.array([X_spiketrain_time, Y_spiketrain_id_final]).T
+
+        if mode=='train':
             print("### 3. load ground truth")
             sorting = se.NpzSortingExtractor(
                 pth + f"mountainsort/{date_id_all_i}/sorting/firings_merged.npz"
@@ -245,6 +249,7 @@ def generate_autosort_input(
             save_obj(Y_spiketrain_id_final, current_save_path + "/Y_spike_id_noise")
             save_obj(X_spiketrain_time, current_save_path + "/X_spiketrain_time")
 
+
             print("### 7. find corresponding waveform")
             X_spiketrain_time_train = np.array(X_spiketrain_time_train)
             Y_spiketrain_id_train = np.array(Y_spiketrain_id_train)[
@@ -276,3 +281,32 @@ def generate_autosort_input(
                 Y_spiketrain_id_final_train, current_save_path + "/Y_spike_id_noise"
             )
             save_obj(X_spiketrain_time_train, current_save_path + "/X_spiketrain_time")
+
+        else:
+            print("### 5. find corresponding waveform")
+            X_spiketrain_time = np.array(X_spiketrain_time)
+            # Y_spiketrain_id = np.array(Y_spiketrain_id)[
+            #     X_spiketrain_time < trace0_car.shape[0] - (left_sample + right_sample)
+            # ]
+            Y_spiketrain_id_final = np.array(Y_spiketrain_id_final)[
+                X_spiketrain_time < trace0_car.shape[0] - (left_sample + right_sample)
+            ]
+            X_spiketrain_time = X_spiketrain_time[
+                X_spiketrain_time < trace0_car.shape[0] - (left_sample + right_sample)
+            ]
+            for time_range in tqdm(np.arange(-left_sample, right_sample)):
+                if time_range == -left_sample:
+                    waveform = trace0_car[X_spiketrain_time + time_range, :]
+                else:
+                    waveform = np.dstack(
+                        (waveform, trace0_car[X_spiketrain_time + time_range, :])
+                    )
+
+            print("### 6. save output")
+            current_save_path = save_pth + "/input/" + date_id_all_i + "/test_data/"
+            Path(current_save_path).mkdir(parents=True, exist_ok=True)
+            save_obj(waveform, current_save_path + "/X_waveform")
+            # save_obj(Y_spiketrain_id, current_save_path + "/Y_spike_id")
+            save_obj(Y_spiketrain_id_final, current_save_path + "/Y_spike_id_noise")
+            save_obj(X_spiketrain_time, current_save_path + "/X_spiketrain_time")
+

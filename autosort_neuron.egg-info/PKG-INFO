@@ -1,11 +1,14 @@
 Metadata-Version: 2.1
-Name: autosort-neuron
-Version: 0.0.1.3
+Name: autosort_neuron
+Version: 0.0.1.4
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: spikeinterface[full,widgets]==0.95.1
+Requires-Dist: torch
+Requires-Dist: mountainsort4
 
 # AutoSort
-**Multimodal deep learning for real-time stable tracking of month-long neural activities from the same cells**
+**Multimodal deep learning for real-time stable decoding of month-long neural activities from the same cells**
 
 <p align="center">
   <img src="/img/figure1.png" >

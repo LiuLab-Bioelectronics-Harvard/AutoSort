@@ -1,40 +1,11 @@
 import math
 import scipy
 import numpy as np
+from tqdm import tqdm
 
-
-def offline_smoother(yIn, kernSD, stepSize):
-    causal = False
-
-    if (kernSD == 0) or (yIn.shape[1] == 1):
-        yOut = yIn
-        return yOut
-
-    # Filter half length
-    # Go 3 standard deviations out
-    fltHL = math.ceil(3 * kernSD / stepSize)
-
-    # Length of flt is 2*fltHL + 1
-    flt = scipy.stats.norm.pdf(
-        np.arange(-fltHL * stepSize, fltHL * stepSize, stepSize), loc=0, scale=kernSD
-    )
-
-    [yDim, T] = shape(yIn)
-    yOut = np.zeros((yDim, T))
-
-    nm = scipy.signal.convolve(
-        flt.reshape(1, -1), np.ones((1, T)), mode="full", method="auto"
-    )
-
-    for i in range(yDim):
-
-        ys = np.divide(
-            scipy.signal.convolve(flt.reshape(1, -1), yIn[i, :].reshape(1, -1)), nm
-        )
-        #     # Cut off edges so that result of convolution is same length
-        #     # as original data
-        yOut[i, :] = ys[0, fltHL : ys.shape[1] - fltHL + 1]
-    return yOut
+from tqdm import tqdm
+from skimage.measure import block_reduce
+import scipy
 
 
 class FSM2:
@@ -44,7 +15,7 @@ class FSM2:
         if W0 is None:
             self.W = np.eye(k, d) / d
         else:
-            self.W = W0
+            self.W = W0;
         self.M = np.eye(k)
         if Minv0 is None:
             self.Minv = np.eye(k)
@@ -87,15 +58,56 @@ class FSM2:
         #             print('i',i,'y[i]',y[i])
 
         y_up = np.tril(
-            np.dot(y.reshape(y.shape[0], 1), y.reshape(y.shape[0], 1).T)
-        )  # extract lower triangular component of y
+            np.dot(y.reshape(y.shape[0], 1), y.reshape(y.shape[0], 1).T))  # extract lower triangular component of y
         #         print('y_up',y_up)
-        self.W = self.W + step * (
-            y.reshape(y.shape[0], 1) * x.reshape(x.shape[0], 1).T - self.W
-        )  # update W matrix
+        self.W = self.W + step * (y.reshape(y.shape[0], 1) * x.reshape(x.shape[0], 1).T - self.W)  # update W matrix
         #         print('W',self.W)
         self.M = self.M + step * (y_up - self.M)  # update M matrix
         #         print('M',self.M)
-        self.t = self.t + 1
+        self.t = self.t + 1;
         #         print('t',self.t)
         return y
+
+
+
+def offline_smoother(yIn, kernSD, stepSize):
+    causal = False;
+
+    if (kernSD == 0) or (yIn.shape[1]==1):
+        yOut = yIn
+        return yOut
+
+
+    # Filter half length
+    # Go 3 standard deviations out
+    fltHL = math.ceil(3 * kernSD / stepSize)
+
+    # Length of flt is 2*fltHL + 1
+    flt = scipy.stats.norm.pdf(np.arange(-fltHL*stepSize ,fltHL*stepSize,stepSize), loc=0, scale = kernSD)
+
+
+    [yDim, T] = shape(yIn)
+    yOut      = np.zeros((yDim, T))
+
+    nm = scipy.signal.convolve(flt.reshape(1,-1), np.ones((1,T)), mode='full', method='auto')
+
+    for i in range(yDim):
+
+        ys = np.divide(scipy.signal.convolve(flt.reshape(1,-1),yIn[i,:].reshape(1,-1)) , nm)
+    #     # Cut off edges so that result of convolution is same length
+    #     # as original data
+        yOut[i,:] = ys[0,fltHL:ys.shape[1]-fltHL+1]
+    return yOut
+
+
+def find_trials(cont_trigger_all_all):
+    timepoint = np.where(cont_trigger_all_all==1)[0]
+    trial_end_t = np.where(np.diff(timepoint)>50)[0]
+    trial_start_t = np.where(np.diff(timepoint)>50)[0]+1
+    trial_start_t = np.insert(trial_start_t,0,0)
+
+    trial_end_t = np.insert(trial_end_t,len(trial_end_t),len(timepoint)-1)
+
+    trial_start = timepoint[trial_start_t]
+    trial_end = timepoint[trial_end_t]
+    return trial_start, trial_end

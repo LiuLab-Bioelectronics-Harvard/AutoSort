@@ -36,28 +36,27 @@ This package is supported for *Linux*. The package has been tested on the follow
 `AutoSort` mainly depends on the Python scientific stack.
 
 ```
-numpy
+spikeinterface
 scipy
 scikit-learn
 pandas
 pytorch
-scanpy
 seaborn
 ```
 
 ## Installation
 ```
-pip install autosort-neuron==0.0.0
+pip install autosort-neuron==0.0.1.4
 ```
 
 
 ## Tutorial
-- Read our [tutorials](./tutorial_sample_data.ipynb) with [provided datasets](https://drive.google.com/drive/folders/1DKfP5awTUa5gaL0WB-csD0M8v-COiBfY?usp=sharing) .
+- Read our [tutorials](https://autosort.readthedocs.io/en/latest/index.html) with [provided datasets](https://drive.google.com/drive/folders/1DKfP5awTUa5gaL0WB-csD0M8v-COiBfY?usp=sharing) .
 
 
 ## Citation
 
 If you find AutoSort useful for your work, please cite our paper: 
 
-> Multimodal deep learning for real-time stable tracking of month-long neural activities from the same cells.
+> Multimodal deep learning for real-time stable decoding of month-long neural activities from the same cells.
 Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. Preprint at bioRxiv ? (2024).

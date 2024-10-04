@@ -2,6 +2,7 @@ LICENSE
 README.md
 setup.py
 autosort_neuron/__init__.py
+autosort_neuron/auto_sorting.py
 autosort_neuron/config.py
 autosort_neuron/detection.py
 autosort_neuron/model.py

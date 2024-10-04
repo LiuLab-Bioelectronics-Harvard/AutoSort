@@ -1,3 +1,4 @@
+import torch.nn.functional as nnf
 import torch
 import torch.nn as nn
 import numpy as np

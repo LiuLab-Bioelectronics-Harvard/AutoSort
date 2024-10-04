@@ -1,16 +1,13 @@
 import os
 import pandas as pd
 import torch
-import torch.nn.functional as F
 from torch.utils.data import random_split
-import time
 from waveform_loader import *
 from tqdm import tqdm
 from model import *
 from sklearn.metrics import accuracy_score,f1_score
 from pathlib import Path
 from autosort_neuron.utils import seed_all
-from sklearn.metrics import balanced_accuracy_score
 
 #  use gpu if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -38,6 +35,7 @@ def run(args):
     Path(save_dir).mkdir(parents=True, exist_ok=True)
 
 
+    
     set_channel_id = args.group
     sensor_positions = args.sensor_positions_all
 
@@ -76,21 +74,10 @@ def run(args):
 
     else:
         training_log = {'epoch': [],
-                        'training_loss1': [],
-                        'training_loss2': [],
-                        'training_loss3': [],
-                        'validation_loss1': [],
-                        'validation_loss2': [],
-                        'validation_loss3': [],
                         'validation_acc_noise':[],
-                        'validation_acc_label':[],
-                        'validation_acc_noise_unbalanced': [],
-                        'validation_acc_label_unbalanced': [],
-                        'starttime_all':[],
-                        'endtime_all':[]}
+                        'validation_acc_label':[]}
 
         for epoch in range(epochs):
-            training_log['starttime_all'].append(time.perf_counter())
             training_log['epoch'].append(epoch + 1)
             print("epoch : {}/{}".format(epoch + 1, epochs))
 
@@ -117,12 +104,7 @@ def run(args):
             loss1 = loss1 / len(train_loader)
             loss2 = loss2 / len(train_loader)
             loss3 = loss3 / len(train_loader)
-            print("epoch : {}/{}, loss 1 = {:.6f}, loss 2 = {:.6f},, loss 3 = {:.6f}".format(epoch + 1, epochs, loss1,loss2,loss3))
-
-
-            training_log['training_loss1'].append(loss1)
-            training_log['training_loss2'].append(loss2)
-            training_log['training_loss3'].append(loss3)
+            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, loss1,loss2,loss3))
 
 
             valid_loss1 = 0.0
@@ -148,7 +130,6 @@ def run(args):
                 pred_class_all.append(pred_class.detach().cpu().numpy())
                 gt_class_all.append(gt_label_class.detach().cpu().numpy())
 
-
             gt_all = np.concatenate(gt_all, axis=0)
             pred_all = np.concatenate(pred_all, axis=0)
             gt_class_all = np.concatenate(gt_class_all, axis=0)
@@ -158,16 +139,11 @@ def run(args):
             valid_loss2 = valid_loss2 / len(val_loader)
             valid_loss3 = valid_loss3 / len(val_loader)
             valid_loss = valid_loss1 +valid_loss2 + valid_loss3
-            print("epoch : {}/{}, val loss 1 = {:.6f}, loss 2 = {:.6f},loss 3 = {:.6f}".format(epoch + 1, epochs, valid_loss1, valid_loss2, valid_loss3))
+            print("epoch : {}/{}, detection loss = {:.6f}, classification loss = {:.6f}".format(epoch + 1, epochs, valid_loss1, valid_loss2, valid_loss3))
 
-            training_log['validation_loss1'].append(valid_loss1)
-            training_log['validation_loss2'].append(valid_loss2)
-            training_log['validation_loss3'].append(valid_loss3)
+
             training_log['validation_acc_noise'].append(accuracy_score(gt_all, pred_all))
             training_log['validation_acc_label'].append(f1_score(gt_class_all, pred_class_all,average='micro'))
-            training_log['validation_acc_noise_unbalanced'].append(balanced_accuracy_score(gt_all, pred_all))
-            training_log['validation_acc_label_unbalanced'].append(balanced_accuracy_score(gt_class_all, pred_class_all))
-            training_log['endtime_all'].append(time.perf_counter())
 
             if min_valid_loss > valid_loss:
                 print(f'Validation Loss Decreased({min_valid_loss:.6f}--->{valid_loss:.6f}) \t Saving The Model')
@@ -178,51 +154,113 @@ def run(args):
         pd.DataFrame(training_log).to_csv(save_dir+'training_log.csv')
 
 
-    #### test AutoSort
-    test_log = {'train_time':[], 'timepoint':[],'noise_acc':[],'label_acc':[],'noise_acc_unbalanced':[],'label_acc_unbalanced':[],}
+    #### validate AutoSort
+    if args.mode=='train':
+        test_log = {'train_time':[], 'timepoint':[],'noise_acc':[],'label_acc':[],}
+        for test_time in args.test_time:
+            set_day_id_str = args.day_id_str[test_time]
 
-    for test_time in args.test_time:
-        set_day_id_str = args.day_id_str[test_time]
-
-        test_notpure_dataset = waveformLoader(data_path+'/test_data/',
-                                        shank_channel = set_channel_id,
-                                        sensor_positions=sensor_positions,
-                                        Keep_id = train_notpure_dataset.keep_id,
-                                        )
-
-
-        test_notpure_loader = torch.utils.data.DataLoader(test_notpure_dataset,
-        batch_size=512, shuffle=False,)
-
-        gt_all = []
-        pred_all = []
-        gt_class_all = []
-        pred_class_all = []
-        autosort_model.eval()
-        for data, classify_labels, labels, single_waveform,pred_loc in tqdm(test_notpure_loader):
-            classify_labels = classify_labels.to(device)
-            data = data.view(-1, args.samplepoints * args.ch_num).to(device)
-            labels = labels.to(device)
-            single_waveform  = single_waveform.to(device)
-            pred_loc=torch.tensor(pred_loc).to(device)
-            _,_,_, gt, pred, gt_label_class, pred_class = autosort_model.iter_model_eval(data, classify_labels, labels, single_waveform,pred_loc)
-            gt_all.append(gt.detach().cpu().numpy())
-            pred_all.append(pred.detach().cpu().numpy())
-            pred_class_all.append(pred_class.detach().cpu().numpy())
-            gt_class_all.append(gt_label_class.detach().cpu().numpy())
+            test_notpure_dataset = waveformLoader(data_path+'/test_data/',
+                                            shank_channel = set_channel_id,
+                                            sensor_positions=sensor_positions,
+                                            Keep_id = train_notpure_dataset.keep_id,
+                                            )
 
 
-        gt_all = np.concatenate(gt_all, axis=0)
-        pred_all = np.concatenate(pred_all, axis=0)
-        gt_class_all = np.concatenate(gt_class_all, axis=0)
-        pred_class_all = np.concatenate(pred_class_all, axis=0)
+            test_notpure_loader = torch.utils.data.DataLoader(test_notpure_dataset,
+            batch_size=512, shuffle=False,)
 
-        test_log['train_time'].append(args.day_id_str[args.set_time])
-        test_log['timepoint'].append(set_day_id_str)
-        test_log['noise_acc'].append(accuracy_score(gt_all, pred_all))
-        test_log['label_acc'].append(accuracy_score(gt_class_all, pred_class_all))
-        test_log['noise_acc_unbalanced'].append(balanced_accuracy_score(gt_all, pred_all))
-        test_log['label_acc_unbalanced'].append(balanced_accuracy_score(gt_class_all, pred_class_all))
+            gt_all = []
+            pred_all = []
+            gt_class_all = []
+            pred_class_all = []
+            autosort_model.eval()
+            for data, classify_labels, labels, single_waveform,pred_loc in tqdm(test_notpure_loader):
+                classify_labels = classify_labels.to(device)
+                data = data.view(-1, args.samplepoints * args.ch_num).to(device)
+                labels = labels.to(device)
+                single_waveform  = single_waveform.to(device)
+                pred_loc=torch.tensor(pred_loc).to(device)
+                _,_,_, gt, pred, gt_label_class, pred_class = autosort_model.iter_model_eval(data, classify_labels, labels, single_waveform,pred_loc)
+                gt_all.append(gt.detach().cpu().numpy())
+                pred_all.append(pred.detach().cpu().numpy())
+                pred_class_all.append(pred_class.detach().cpu().numpy())
+                gt_class_all.append(gt_label_class.detach().cpu().numpy())
 
-    pd.DataFrame(test_log).to_csv(save_dir+'test_log.csv')
 
+            gt_all = np.concatenate(gt_all, axis=0)
+            pred_all = np.concatenate(pred_all, axis=0)
+            gt_class_all = np.concatenate(gt_class_all, axis=0)
+            pred_class_all = np.concatenate(pred_class_all, axis=0)
+
+            test_log['train_time'].append(args.day_id_str[args.set_time])
+            test_log['timepoint'].append(set_day_id_str)
+            test_log['noise_acc'].append(accuracy_score(gt_all, pred_all))
+            test_log['label_acc'].append(accuracy_score(gt_class_all, pred_class_all))
+
+        pd.DataFrame(test_log).to_csv(save_dir+'test_log.csv')
+
+    if args.mode=='test':
+        save_dir_offline = args.cluster_path+"model_save/"+"train_day"+set_day_id_str+'_'+str(args.seed_all)+'/offline_result/'
+        Path(save_dir_offline).mkdir(parents=True, exist_ok=True)
+        for test_time in args.test_time:
+            set_day_id_str = args.day_id_str[test_time]
+            test_data_path = args.cluster_path+"input/"+set_day_id_str
+
+            test_notpure_dataset = waveformLoader(test_data_path+'/test_data/',
+                                            shank_channel = set_channel_id,
+                                            sensor_positions=sensor_positions,
+                                            Keep_id = train_notpure_dataset.keep_id,
+                                            )
+            
+            test_notpure_loader = torch.utils.data.DataLoader(test_notpure_dataset,
+                                                              batch_size=512, shuffle=False, )
+
+            gt_all = []
+            pred_all = []
+            gt_class_all = []
+            pred_class_all = []
+            code_all_latent = []
+            code_all_label = []
+            pred_prob_all=[]
+            autosort_model.eval()
+            for data, classify_labels, labels, single_waveform, pred_loc in tqdm(test_notpure_loader):
+                classify_labels = classify_labels.to(device)
+                data = data.view(-1, args.samplepoints * args.ch_num).to(device)
+                labels = labels.to(device)
+                single_waveform = single_waveform.to(device)
+                pred_loc = torch.tensor(pred_loc).to(device)
+
+                _, pred, _, pred_class, codetest, codetest_label, pred_prob = autosort_model.iter_model_eval_umap(
+                    data, classify_labels, labels, single_waveform, pred_loc)
+
+                code_all_latent.append(codetest.detach().cpu().numpy())
+                code_all_label.append(codetest_label.detach().cpu().numpy())
+
+                # gt_all.append(gt.detach().cpu().numpy())
+                pred_all.append(pred.detach().cpu().numpy())
+                pred_class_all.append(pred_class.detach().cpu().numpy())
+                # gt_class_all.append(gt_label_class.detach().cpu().numpy())
+                pred_prob_all.append(pred_prob.detach().cpu().numpy())
+
+            # gt_all = np.concatenate(gt_all, axis=0)
+            pred_all = np.concatenate(pred_all, axis=0)
+            # gt_class_all = np.concatenate(gt_class_all, axis=0)
+            pred_class_all = np.concatenate(pred_class_all, axis=0)
+            code_all_latent = np.vstack(code_all_latent)
+            pred_prob_all = np.vstack(pred_prob_all)
+
+            code_all_label_final = []
+            for i in code_all_label:
+                if i.shape[0] > 0:
+                    code_all_label_final.append(i)
+            code_all_label_final = np.vstack(code_all_label_final)
+
+            Path(save_dir_offline + set_day_id_str + '/').mkdir(parents=True, exist_ok=True)
+            # pd.DataFrame(gt_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'gt_all.csv')
+            pd.DataFrame(pred_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'pred_all.csv')
+            # pd.DataFrame(gt_class_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'gt_class_all.csv')
+            pd.DataFrame(pred_class_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'pred_class_all.csv')
+            pd.DataFrame(code_all_latent).to_csv(save_dir_offline + set_day_id_str + '/' + 'code_all_latent.csv')
+            pd.DataFrame(code_all_label_final).to_csv(save_dir_offline + set_day_id_str + '/' + 'code_all_label.csv')
+            pd.DataFrame(pred_prob_all).to_csv(save_dir_offline + set_day_id_str + '/' + 'pred_prob_all.csv')

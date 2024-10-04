@@ -1,7 +1,3 @@
-spikeinterface[full,widgets]
+spikeinterface[full,widgets]==0.95.1
 torch
-pandas
-scikit-learn
-matplotlib
-scipy
-networkx
+mountainsort4
