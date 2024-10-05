@@ -3,7 +3,7 @@ AutoSort
 
 
 Multimodal deep learning for real-time stable decoding of month-long neural activities from the same cells
------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
 .. image:: _static/figure1.png
     :width: 100%
     :align: center
@@ -38,12 +38,12 @@ Quick start
 
 Spike sorting
 ^^^^^^^^^^^^^^^^^^^^^
-:mod:`autosort.run` provides tools to efficiently sort spikes from long-term recordings.
+:mod:`autosort_neuron.run` provides tools to efficiently sort spikes from long-term recordings.
 
 
 Online decoding
 ^^^^^^^^^^^^^^^^^^^
-:mod:`autosort.decoding` provides tools to decode neural activities from the same cells across days.
+:mod:`autosort_neuron.decoding` provides tools to decode neural activities from the same cells across days.
 
 
 Step-by-step guide 

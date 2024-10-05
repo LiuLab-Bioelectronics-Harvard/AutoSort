@@ -5,18 +5,10 @@ API Reference
 
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :hidden:
 
     API Reference <self>
-
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   autosort_neuron.intanutil
 
 Submodules
 ----------
