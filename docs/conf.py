@@ -56,13 +56,11 @@ todo_include_todos = True
 
 # nbsphinx configuration
 nbsphinx_thumbnails = {
-    'notebooks/spatial_integrate_tech': '_static/test.png',
-    'notebooks/spatial_integrate_species': '_static/test.png',
-    'notebooks/spatial_impute': '_static/test.png',
-    'notebooks/spatial_map_mousebrain': '_static/test.png',
-    'notebooks/spatial_map_mousehuman': '_static/test.png'
+    'notebooks/train_autosort': '_static/tutorial1.png',
+    'notebooks/apply_autosort': '_static/tutorial2.png',
+    'notebooks/realtime_processing': '_static/tutorial3.png',
+    'notebooks/neural_dynamics': '_static/tutorial4.png',
 }
-
 
 templates_path = ['_templates']
 
