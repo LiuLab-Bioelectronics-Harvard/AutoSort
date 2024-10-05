@@ -9,7 +9,7 @@ Tutorials
 
 .. nbgallery::
     Start with AutoSort<notebooks/train_autosort>
-    Long-term spike sorting<notebooks/apply_autosort>
-    Real-time processing <notebooks/realtime_processing>
+    Efficient spike sorting in long-term recordings<notebooks/apply_autosort>
     Decode neural dynamics <notebooks/neural_dynamics>
+    Real-time processing <notebooks/realtime_processing>
 

@@ -6,6 +6,8 @@ from tqdm import tqdm
 from tqdm import tqdm
 from skimage.measure import block_reduce
 import scipy
+import matplotlib.pyplot as plt
+
 
 
 class FSM2:
@@ -31,8 +33,8 @@ class FSM2:
             self.lr = lambda x: learning_rate
 
         self.t = 0
-        self.outer_W = np.zeros(shape(self.W))
-        self.outer_Minv = np.zeros(shape(self.Minv))
+        self.outer_W = np.zeros(np.shape(self.W))
+        self.outer_Minv = np.zeros(np.shape(self.Minv))
         self.y = []
 
     def fit_next(self, x):
@@ -40,7 +42,7 @@ class FSM2:
         #         print('step',step)
 
         z = np.dot(self.W, x.T)
-        y = np.zeros(shape(z))
+        y = np.zeros(np.shape(z))
         #         print('z',z)
         #         print('y',y)
 
@@ -69,7 +71,6 @@ class FSM2:
         return y
 
 
-
 def offline_smoother(yIn, kernSD, stepSize):
     causal = False;
 
@@ -86,7 +87,7 @@ def offline_smoother(yIn, kernSD, stepSize):
     flt = scipy.stats.norm.pdf(np.arange(-fltHL*stepSize ,fltHL*stepSize,stepSize), loc=0, scale = kernSD)
 
 
-    [yDim, T] = shape(yIn)
+    [yDim, T] = np.shape(yIn)
     yOut      = np.zeros((yDim, T))
 
     nm = scipy.signal.convolve(flt.reshape(1,-1), np.ones((1,T)), mode='full', method='auto')
@@ -99,15 +100,95 @@ def offline_smoother(yIn, kernSD, stepSize):
         yOut[i,:] = ys[0,fltHL:ys.shape[1]-fltHL+1]
     return yOut
 
+    
+def SMA(data, time_bin,kernSD_coef=0.52, stepSize_coef=0.15):
+    N = data.shape[0]
+    D = data.shape[1]
+    k=3;
+    scal = 1;
 
-def find_trials(cont_trigger_all_all):
-    timepoint = np.where(cont_trigger_all_all==1)[0]
-    trial_end_t = np.where(np.diff(timepoint)>50)[0]
-    trial_start_t = np.where(np.diff(timepoint)>50)[0]+1
-    trial_start_t = np.insert(trial_start_t,0,0)
 
-    trial_end_t = np.insert(trial_end_t,len(trial_end_t),len(timepoint)-1)
+    a = -scal
+    b = scal
+    W0 = a + (b-a)* np.eye(k,D)
+    W0 = W0 / scal
 
-    trial_start = timepoint[trial_start_t]
-    trial_end = timepoint[trial_end_t]
-    return trial_start, trial_end
+    W_hist = np.zeros((k, D))
+    M_hist = np.zeros((k, k))
+    y_hist = np.zeros((k, N))
+
+    ### apply FSM
+    fsm = FSM2(k=k, d=D, W0 =W0, learning_rate = 0.01)
+    for i in tqdm(range(N)):
+        bb=data[i,:]
+        y_hist[:,i] = fsm.fit_next(bb);
+
+    kernSD = time_bin*kernSD_coef;
+    stepSize = time_bin*stepSize_coef
+
+
+    ### smooth
+    data_sma = np.zeros((3,time_bin,int(y_hist.shape[1]/time_bin)))
+    for j in np.arange(math.floor(y_hist.shape[1]/time_bin)):
+        data_sma[:,:,int(j)] = offline_smoother(y_hist[:,int(j*time_bin):int((j+1)*time_bin)], kernSD, stepSize)
+    return data_sma
+
+
+def extract_trial_data(trial_start, 
+                       trial_end, 
+                       onlinetraj_raster, 
+                       start_interval1, 
+                       start_interval2,
+                       num_neurons,
+                       num_bins):
+    num_trials = len(trial_start)
+    num_stimulus=start_interval1+start_interval2
+    trial_test=np.zeros((num_trials, num_neurons, num_stimulus))#len(trial_start)
+    time_bin = num_bins
+    data=np.zeros((time_bin*(num_trials),onlinetraj_raster.shape[1]))
+    for j in np.arange(len(trial_end)):
+        trial_test[j,...] = onlinetraj_raster[trial_start[j]-start_interval1:trial_start[j]+start_interval2,:].T
+        arr_reduced = block_reduce(trial_test[j], block_size=(1,int(trial_test[j].shape[1]/time_bin)),
+                                    func=np.sum, cval=0)
+        data[(j)*time_bin:(j+1)*time_bin,:] = arr_reduced.T
+    return data,trial_test
+            
+    # num_trials = len(trial_start)
+    # trial_test=np.zeros((num_trials, num_neurons, num_stimulus))#len(trial_start)
+    # time_bin = num_bins
+    # data=np.zeros((time_bin*(num_trials),onlinetraj_raster.shape[1]))
+    # data_datahigh=np.zeros((num_trials, num_neurons, int((start_interval1+start_interval2)/10) ))
+    # trial_num=[]
+    # for j in np.arange(len(trial_end)):
+    #     trial_test[j,...] = onlinetraj_raster[trial_start[j]-start_interval1:trial_start[j]+start_interval2,:].T
+    #     arr_reduced = block_reduce(trial_test[j], block_size=(1,int(trial_test[j].shape[1]/time_bin)),
+    #                                 func=np.sum, cval=0)
+    #     data[(j)*time_bin:(j+1)*time_bin,:] = arr_reduced.T
+    #     arr_reduced_2 = block_reduce(trial_test[j], block_size=(1,10),
+    #                                 func=np.max, cval=0)        
+    #     data_datahigh[j,:,:] = arr_reduced_2
+    #     trial_num+=[j]*num_bins
+
+
+def plot_neuron_spike_train(spike_train, 
+                            num_trials, 
+                            num_neurons, 
+                            num_bins, 
+                            start_interval1, 
+                            start_interval2):
+    stimulus_times=[-start_interval1/10000, start_interval2/10000]
+    fig, axs = plt.subplots(nrows=4, ncols=int(np.ceil(num_neurons/4)), figsize=(10, 10), sharey='row')
+    for ax, neuron_idx in zip(axs.flat,
+                     range(num_neurons)):
+        neuron_data = spike_train[:, neuron_idx, :]
+        bin_edges = np.linspace(stimulus_times[0], stimulus_times[-1], num_bins+1)
+
+        for i in range(num_trials):
+            ind = np.where(neuron_data[i,:])[0]
+            ax.eventplot(ind,lineoffsets=i,linewidths=0.5, colors='black')
+            ax.set_ylabel('Trial')
+            ax.set_ylim(-0.5, num_trials + 0.5)
+            ax.set_title(f'Neuron {neuron_idx+1}')
+            ax.set_xticks([0,start_interval1,start_interval1+15000,start_interval1+start_interval2],
+                          [stimulus_times[0], 0,(start_interval1+15000)/10000-1, stimulus_times[-1]])
+    plt.subplots_adjust(hspace=0.5)    
