@@ -26,3 +26,4 @@ Authors
 --------------------------------------------------------------------------------
 
 `Yichun He <https://yichunher.github.io/>`__
+`Arnau Marin-Llobet <https://arnaumarin.github.io/>`__
