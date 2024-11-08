@@ -1,5 +1,5 @@
 # AutoSort
-**Multimodal deep learning for real-time stable decoding of month-long neural activities from the same cells**
+**End-to-end multimodal deep learning for real-time decoding of months-long neural activity from the same cells**
 
 <p align="center">
   <img src="/img/figure1.png" >
