@@ -58,5 +58,5 @@ pip install autosort-neuron==0.0.1.4
 
 If you find AutoSort useful for your work, please cite our paper: 
 
-> Multimodal deep learning for real-time stable decoding of month-long neural activities from the same cells.
-Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. Preprint at bioRxiv ? (2024).
+> End-to-end multimodal deep learning for real-time decoding of months-long neural activity from the same cells.
+Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. Preprint at bioRxiv (2024): 10-2024
