@@ -56,7 +56,7 @@ pip install autosort-neuron==0.0.1.4
 
 ## Citation
 
-If you find AutoSort useful for your work, please cite our paper: 
+If you find AutoSort useful for your work, please cite our [paper](https://doi.org/10.1101/2024.10.14.618046): 
 
 > End-to-end multimodal deep learning for real-time decoding of months-long neural activity from the same cells.
-Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. Preprint at bioRxiv (2024): 10-2024
+Yichun He#, Arnau Marin-Llobet#, Hao Sheng, Ren Liu, Jia Liu*. Preprint at bioRxiv (2024): https://doi.org/10.1101/2024.10.14.618046.
