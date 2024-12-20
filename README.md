@@ -20,6 +20,9 @@ For more details, please check out our publication.
 
 
 ## Manuscript code and data
+## Tutorial
+- Read our [tutorials](https://autosort.readthedocs.io/en/latest/index.html) with [provided datasets](https://drive.google.com/drive/folders/18kMTfZKlN7vw04xEVZ5SC2fDD-N9XYxr?usp=drive_link) .
+
 ### Reproducibity
 Code used in the study is uploaded to figshare and will be public with the manuscript publication. 
 
@@ -49,9 +52,6 @@ seaborn
 pip install autosort-neuron==0.0.1.4
 ```
 
-
-## Tutorial
-- Read our [tutorials](https://autosort.readthedocs.io/en/latest/index.html) with [provided datasets](https://drive.google.com/drive/folders/18kMTfZKlN7vw04xEVZ5SC2fDD-N9XYxr?usp=drive_link) .
 
 
 ## Citation
