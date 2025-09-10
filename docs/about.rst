@@ -15,8 +15,8 @@ How to Cite
 
 To cite AutoSort in publications please use:
 
-**End-to-end multimodal deep learning for real-time decoding of months-long neural activity from the same cells **
-`*bioRxiv.* <https://www.biorxiv.org/content/10.1101/2024.10.14.618046v1>`__
+`**End-to-end multimodal deep learning for real-time decoding of months-long neural activity from the same cells **
+*bioRxiv.* <https://www.biorxiv.org/content/10.1101/2024.10.14.618046v1>`__
 
 
 .. _Authors:
